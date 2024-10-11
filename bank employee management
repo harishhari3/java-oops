@@ -1,0 +1,174 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// Base class: Person
+class Person {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void displayDetails() {
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+    }
+}
+
+// Derived class: Employee
+class Employee extends Person {
+    private String employeeId;
+    private String position;
+    private double salary;
+
+    public Employee(String name, int age, String employeeId, String position, double salary) {
+        super(name, age);
+        this.employeeId = employeeId;
+        this.position = position;
+        this.salary = salary;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    @Override
+    public void displayDetails() {
+        super.displayDetails();
+        System.out.println("Employee ID: " + employeeId);
+        System.out.println("Position: " + position);
+        System.out.println("Salary: " + salary);
+    }
+}
+
+// Derived class: Manager
+class Manager extends Employee {
+    private String department;
+
+    public Manager(String name, int age, String employeeId, String position, double salary, String department) {
+        super(name, age, employeeId, position, salary);
+        this.department = department;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    @Override
+    public void displayDetails() {
+        super.displayDetails();
+        System.out.println("Department: " + department);
+    }
+}
+
+// Utility class: Bank
+class Bank {
+    private List<Employee> employees;
+
+    public Bank() {
+        employees = new ArrayList<>();
+    }
+
+    public void addEmployee(Employee employee) {
+        employees.add(employee);
+        System.out.println("Employee added: " + employee.getName());
+    }
+
+    public void removeEmployee(String employeeId) {
+        employees.removeIf(emp -> emp.getEmployeeId().equals(employeeId));
+        System.out.println("Employee with ID " + employeeId + " removed.");
+    }
+
+    public void displayAllEmployees() {
+        if (employees.isEmpty()) {
+            System.out.println("No employees found.");
+        } else {
+            for (Employee emp : employees) {
+                System.out.println("----------------------------");
+                emp.displayDetails();
+            }
+        }
+    }
+}
+
+public class BankEmployeeManagementSystem {
+    public static void main(String[] args) {
+        Bank bank = new Bank();
+        Scanner scanner = new Scanner(System.in);
+        int option;
+
+        do {
+            System.out.println("\n===== Bank Employee Management =====");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Remove Employee");
+            System.out.println("3. Display All Employees");
+            System.out.println("4. Exit");
+            System.out.print("Enter option: ");
+            option = scanner.nextInt();
+
+            switch (option) {
+                case 1:
+                    System.out.print("Enter name: ");
+                    String name = scanner.next();
+                    System.out.print("Enter age: ");
+                    int age = scanner.nextInt();
+                    System.out.print("Enter employee ID: ");
+                    String empId = scanner.next();
+                    System.out.print("Enter position: ");
+                    String position = scanner.next();
+                    System.out.print("Enter salary: ");
+                    double salary = scanner.nextDouble();
+
+                    Employee employee;
+                    if (position.equalsIgnoreCase("Manager")) {
+                        System.out.print("Enter department: ");
+                        String department = scanner.next();
+                        employee = new Manager(name, age, empId, position, salary, department);
+                    } else {
+                        employee = new Employee(name, age, empId, position, salary);
+                    }
+
+                    bank.addEmployee(employee);
+                    break;
+
+                case 2:
+                    System.out.print("Enter employee ID to remove: ");
+                    String removeId = scanner.next();
+                    bank.removeEmployee(removeId);
+                    break;
+
+                case 3:
+                    bank.displayAllEmployees();
+                    break;
+
+                case 4:
+                    System.out.println("Exiting...");
+                    break;
+
+                default:
+                    System.out.println("Invalid option! Try again.");
+            }
+        } while (option != 4);
+
+        scanner.close();
+    }
+}
