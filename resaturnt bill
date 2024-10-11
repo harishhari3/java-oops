@@ -1,0 +1,180 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// Class: MenuItem
+class MenuItem {
+    private String name;
+    private double price;
+
+    public MenuItem(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void displayItem() {
+        System.out.println(name + " - $" + price);
+    }
+}
+
+// Class: OrderItem (Composition of MenuItem)
+class OrderItem {
+    private MenuItem menuItem;
+    private int quantity;
+
+    public OrderItem(MenuItem menuItem, int quantity) {
+        this.menuItem = menuItem;
+        this.quantity = quantity;
+    }
+
+    public MenuItem getMenuItem() {
+        return menuItem;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public double getTotalPrice() {
+        return menuItem.getPrice() * quantity;
+    }
+
+    public void displayOrderItem() {
+        System.out.println(menuItem.getName() + " x" + quantity + " - $" + getTotalPrice());
+    }
+}
+
+// Class: Order
+class Order {
+    private List<OrderItem> orderItems;
+
+    public Order() {
+        orderItems = new ArrayList<>();
+    }
+
+    public void addItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        System.out.println(orderItem.getMenuItem().getName() + " added to the order.");
+    }
+
+    public void removeItem(String itemName) {
+        orderItems.removeIf(item -> item.getMenuItem().getName().equals(itemName));
+        System.out.println(itemName + " removed from the order.");
+    }
+
+    public void displayOrder() {
+        if (orderItems.isEmpty()) {
+            System.out.println("No items in the order.");
+        } else {
+            System.out.println("\n===== Current Order =====");
+            for (OrderItem item : orderItems) {
+                item.displayOrderItem();
+            }
+        }
+    }
+
+    public double calculateTotal() {
+        double total = 0;
+        for (OrderItem item : orderItems) {
+            total += item.getTotalPrice();
+        }
+        return total;
+    }
+}
+
+// Class: Restaurant
+class Restaurant {
+    private List<MenuItem> menu;
+    private Order currentOrder;
+
+    public Restaurant() {
+        menu = new ArrayList<>();
+        currentOrder = new Order();
+        populateMenu();  // Automatically adds items to the menu
+    }
+
+    private void populateMenu() {
+        menu.add(new MenuItem("Pizza", 8.99));
+        menu.add(new MenuItem("Burger", 5.49));
+        menu.add(new MenuItem("Pasta", 7.99));
+        menu.add(new MenuItem("Soda", 1.99));
+        menu.add(new MenuItem("Coffee", 2.49));
+    }
+
+    public void displayMenu() {
+        System.out.println("\n===== Menu =====");
+        for (int i = 0; i < menu.size(); i++) {
+            System.out.print((i + 1) + ". ");
+            menu.get(i).displayItem();
+        }
+    }
+
+    public MenuItem getMenuItemByIndex(int index) {
+        if (index >= 0 && index < menu.size()) {
+            return menu.get(index);
+        }
+        return null;
+    }
+
+    public void takeOrder() {
+        Scanner scanner = new Scanner(System.in);
+        int option;
+
+        do {
+            System.out.println("\n===== Restaurant Order System =====");
+            System.out.println("1. Display Menu");
+            System.out.println("2. Add Item to Order");
+            System.out.println("3. Remove Item from Order");
+            System.out.println("4. Display Current Order");
+            System.out.println("5. Calculate Total Bill");
+            System.out.println("6. Exit");
+            System.out.print("Enter your choice: ");
+            option = scanner.nextInt();
+
+            switch (option) {
+                case 1:
+                    displayMenu();
+                    break;
+
+                case 2:
+                    System.out.print("Enter the item number to add: ");
+                    int itemIndex = scanner.nextInt() - 1;
+                    MenuItem selectedItem = getMenuItemByIndex(itemIndex);
+                    if (selectedItem != null) {
+                        System.out.print("Enter the quantity: ");
+                        int quantity = scanner.nextInt();
+                        OrderItem orderItem = new OrderItem(selectedItem, quantity);
+                        currentOrder.addItem(orderItem);
+                    } else {
+                        System.out.println("Invalid item selection.");
+                    }
+                    break;
+
+                case 3:
+                    System.out.print("Enter the name of the item to remove: ");
+                    String itemName = scanner.next();
+                    currentOrder.removeItem(itemName);
+                    break;
+
+                case 4:
+                    currentOrder.displayOrder();
+                    break;
+
+                case 5:
+                    double total = currentOrder.calculateTotal();
+                    System.out.println("\nTotal Bill: $" + total);
+                    break;
+
+                case 6:
+                    System.out.println("Exiting...");
+                    break;
+
+                default:
